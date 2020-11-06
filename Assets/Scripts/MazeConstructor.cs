@@ -15,8 +15,37 @@ public class MazeConstructor : MonoBehaviour
     // Объект для хранения данных лабиринта
     public int[,] data
     {
-        get;
-        private set;
+        get; private set;
+    }
+
+    // Ширина и высота коридоров
+    public float hallWidth
+    {
+        get; private set;
+    }
+    public float hallHeight
+    {
+        get; private set;
+    }
+
+    // Координаты стартовой позиции
+    public int startRow
+    {
+        get; private set;
+    }
+    public int startCol
+    {
+        get; private set;
+    }
+
+    // Координаты собираемого предмета
+    public int goalRow
+    {
+        get; private set;
+    }
+    public int goalCol
+    {
+        get; private set;
     }
 
     private MazeDataGenerator dataGenerator;
@@ -37,7 +66,8 @@ public class MazeConstructor : MonoBehaviour
         };        
     }
 
-    public void GenerateNewMaze(int sizeRows, int sizeCols)
+    public void GenerateNewMaze(int sizeRows, int sizeCols, 
+        TriggerEventHandler startCallback=null, TriggerEventHandler goalCallback=null)
     {
         //Генерация стен
         // Предупреждение о том, что лучше использовать нечетные числа для генерации лабиринта
@@ -45,11 +75,108 @@ public class MazeConstructor : MonoBehaviour
         {
             Debug.LogError("Odd numbers work better for dungeon size.");
         }
+
+        DisposeOldMaze();
+
         data = dataGenerator.FromDimensions(sizeRows, sizeCols);
 
+        FindStartPosition();
+        FindGoalPosition();
+
+        // store values used to generate this mesh
+        hallWidth = meshGenerator.width;
+        hallHeight = meshGenerator.height;
+
         DisplayMaze();
+
+        PlaceStartTrigger(startCallback);
+        PlaceGoalTrigger(goalCallback);
     }
 
+    // Уничтожение лабиринта
+    public void DisposeOldMaze()
+    {
+        GameObject[] objects = GameObject.FindGameObjectsWithTag("Generated");
+        foreach (GameObject go in objects)
+        {
+            Destroy(go);
+        }
+    }
+
+    // Поиск стартовой позиции
+    private void FindStartPosition()
+    {
+        int[,] maze = data;
+        int rMax = maze.GetUpperBound(0);
+        int cMax = maze.GetUpperBound(1);
+
+        for (int i = 0; i <= rMax; i++)
+        {
+            for (int j = 0; j <= cMax; j++)
+            {
+                if (maze[i, j] == 0)
+                {
+                    startRow = i;
+                    startCol = j;
+                    return;
+                }
+            }
+        }
+    }
+
+    // Поиск позиции собираемого предмета
+    private void FindGoalPosition()
+    {
+        int[,] maze = data;
+        int rMax = maze.GetUpperBound(0);
+        int cMax = maze.GetUpperBound(1);
+
+        // loop top to bottom, right to left
+        for (int i = rMax; i >= 0; i--)
+        {
+            for (int j = cMax; j >= 0; j--)
+            {
+                if (maze[i, j] == 0)
+                {
+                    goalRow = i;
+                    goalCol = j;
+                    return;
+                }
+            }
+        }
+    }
+
+    // Создание визуального элемента начальной точки
+    private void PlaceStartTrigger(TriggerEventHandler callback)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.transform.position = new Vector3(startCol * hallWidth, .5f, startRow * hallWidth);
+        go.name = "Start Trigger";
+        go.tag = "Generated";
+
+        go.GetComponent<BoxCollider>().isTrigger = true;
+        go.GetComponent<MeshRenderer>().sharedMaterial = startMat;
+
+        TriggerEventRouter tc = go.AddComponent<TriggerEventRouter>();
+        tc.callback = callback;
+    }
+
+    // Создание визуального элемента конечной точки
+    private void PlaceGoalTrigger(TriggerEventHandler callback)
+    {
+        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        go.transform.position = new Vector3(goalCol * hallWidth, .5f, goalRow * hallWidth);
+        go.name = "Treasure";
+        go.tag = "Generated";
+
+        go.GetComponent<BoxCollider>().isTrigger = true;
+        go.GetComponent<MeshRenderer>().sharedMaterial = foodMat;
+
+        TriggerEventRouter tc = go.AddComponent<TriggerEventRouter>();
+        tc.callback = callback;
+    }
+
+    // Отображение сгенерированного лабиринта
     public void DisplayMaze()
     {
         GameObject go = new GameObject();
