@@ -268,8 +268,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   showDebug: 1
   floorMat: {fileID: 2100000, guid: 2019d743bc0984ba1b81150901d44455, type: 2}
-  wallMat: {fileID: 2100000, guid: a36a45d20a42a4a0695e782d8b69409e, type: 2}
+  wallMat: {fileID: 2100000, guid: 9257ea5dc1ccb084a84fbc8d7bde9717, type: 2}
   startMat: {fileID: 2100000, guid: c8296ee06001c4d39b0f615626264b85, type: 2}
+  foodObject: {fileID: 126446, guid: c2f4b43f266dc11439efef86830dafb4, type: 3}
   foodMat: {fileID: 2100000, guid: 318a8bab67f7f1f4e97bcf8b4fb31f05, type: 2}
 --- !u!4 &217534904
 Transform:

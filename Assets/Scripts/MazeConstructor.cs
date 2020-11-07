@@ -7,9 +7,11 @@ public class MazeConstructor : MonoBehaviour
     public bool showDebug;
 
     // Поля для материалов
+    //[SerializeField] private Mesh meshObject;
     [SerializeField] private Material floorMat;
     [SerializeField] private Material wallMat;
     [SerializeField] private Material startMat;
+    [SerializeField] private GameObject foodObject;
     [SerializeField] private Material foodMat;
 
     // Объект для хранения данных лабиринта
@@ -164,10 +166,11 @@ public class MazeConstructor : MonoBehaviour
     // Создание визуального элемента конечной точки
     private void PlaceGoalTrigger(TriggerEventHandler callback)
     {
-        GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject go = GameObject.Instantiate(foodObject, new Vector3(goalCol * hallWidth, .5f, goalRow * hallWidth), foodObject.transform.rotation);        
         go.transform.position = new Vector3(goalCol * hallWidth, .5f, goalRow * hallWidth);
+
         go.name = "Treasure";
-        go.tag = "Generated";
+        go.tag = "Generated";        
 
         go.GetComponent<BoxCollider>().isTrigger = true;
         go.GetComponent<MeshRenderer>().sharedMaterial = foodMat;

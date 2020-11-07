@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class MazeMeshGenerator : MonoBehaviour
@@ -36,7 +37,7 @@ public class MazeMeshGenerator : MonoBehaviour
             {
                 if (data[i,j] != 1)
                 {
-                    // Пол
+                    // Пол                   
                     AddQuad(Matrix4x4.TRS(
                         new Vector3(j * width, 0, i * width),
                         Quaternion.LookRotation(Vector3.up),
@@ -44,11 +45,11 @@ public class MazeMeshGenerator : MonoBehaviour
                         ref newVertices, ref newUVs, ref floorTriangles);
 
                     // Потолок
-                    AddQuad(Matrix4x4.TRS(
+                    /*AddQuad(Matrix4x4.TRS(
                         new Vector3(j * width, height, i * width),
                         Quaternion.LookRotation(Vector3.down),
                         new Vector3(width, width, 1)), 
-                        ref newVertices, ref newUVs, ref floorTriangles);
+                        ref newVertices, ref newUVs, ref floorTriangles);*/
 
                     // Стены по бокам от крайних ячеек сгенерированной сетки
                     if (i - 1 < 0 || data[i-1, j] == 1)
